@@ -1,0 +1,22 @@
+{
+  "name": "cityflow-app",
+  "version": "1.0.0",
+  "description": "CityFlow Smart City Management - Next.js + Express + SQLite",
+  "private": true,
+  "workspaces": [
+    "server",
+    "admin",
+    "citizen"
+  ],
+  "scripts": {
+    "dev": "npx concurrently \"npm run dev:server\" \"npm run dev:admin\" \"npm run dev:citizen\"",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:admin": "npm run dev --workspace=admin",
+    "dev:citizen": "npm run dev --workspace=citizen",
+    "install:all": "npm install",
+    "seed": "cd server && npm run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

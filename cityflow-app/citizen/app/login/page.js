@@ -13,6 +13,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [waking, setWaking]       = useState(false);
+
+  useEffect(() => {
+    // Hidden "morning call" to wake up Render (30s on free tier)
+    const wakeUp = async () => {
+      try { await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com'}/api/health`); } catch (e) {}
+    };
+    wakeUp();
+  }, []);
 
   if (user) { router.replace('/dashboard'); return null; }
 

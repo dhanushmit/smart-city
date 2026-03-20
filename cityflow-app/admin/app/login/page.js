@@ -12,6 +12,14 @@ export default function LoginPage() {
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
 
+  useEffect(() => {
+    // Wake up Render (free tier sleep fix)
+    const ping = async () => {
+      try { await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com'}/api/health`); } catch (e) {}
+    };
+    ping();
+  }, []);
+
   if (user) { router.replace('/dashboard'); return null; }
 
   const handleSubmit = async (e) => {
@@ -94,7 +102,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-blue-400/60 text-xs mt-6">
-          CityFlow v2.0 · Next.js + Node.js + SQLite
+          CityFlow v2.0 · Next.js + Node.js + PostgreSQL
         </p>
       </div>
     </div>

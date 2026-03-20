@@ -37,7 +37,7 @@ export default function Navbar({ onOpenSidebar }) {
            </button>
            
            {showNotifs && (
-             <div className="absolute right-0 top-full mt-3 w-80 bg-white rounded-3xl shadow-2xl border border-gray-100 animate-fadeIn overflow-hidden">
+             <div className="absolute right-0 sm:right-0 top-full mt-3 w-[calc(100vw-48px)] sm:w-80 bg-white rounded-3xl shadow-2xl border border-gray-100 animate-fadeIn overflow-hidden z-[100] transform -translate-x-0">
                <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
                   <h3 className="font-bold text-gray-900">Notifications</h3>
                   <span className="text-[10px] font-black uppercase text-blue-600 bg-blue-100 px-2 py-1 rounded-full">{unreadCount} New</span>
@@ -56,7 +56,7 @@ export default function Navbar({ onOpenSidebar }) {
 
          <div className="relative">
            <button onClick={() => { setShowProfile(!showProfile); setShowNotifs(false); }} className="flex items-center gap-3 bg-slate-50 hover:bg-blue-50 hover:border-blue-100 transition-colors cursor-pointer px-4 py-2.5 rounded-[20px] border border-slate-100">
-              <div className="text-right hidden sm:block">
+              <div className="text-right hidden md:block">
                  <p className="text-sm font-bold text-gray-900 leading-none">{user?.first_name} {user?.last_name}</p>
                  <p className="text-[10px] text-gray-400 font-bold tracking-tight mt-1">{user?.ward}</p>
               </div>

@@ -147,8 +147,8 @@ export default function CitizenDashboard() {
       </section>
 
       {/* Quick Actions Hub */}
-      <section className="px-5 mb-10">
-         <div className="bg-slate-50/50 rounded-[36px] p-6 border border-slate-100 flex justify-between items-center shadow-inner">
+      <section className="mb-12">
+         <div className="bg-slate-50/50 rounded-[40px] p-8 border border-slate-100/50 flex justify-between items-center shadow-inner">
             <QuickAction icon={Plus} label="Report" href="/report" color="bg-blue-600" />
             <QuickAction icon={Target} label="Wards" href="/feed" color="bg-indigo-600" />
             <QuickAction icon={MapPin} label="Live Map" href="/feed" color="bg-emerald-600" />

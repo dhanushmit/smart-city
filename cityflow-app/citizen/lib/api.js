@@ -10,29 +10,35 @@ async function apiFetch(path, options = {}, retry = true) {
   const headers = { ...(options.headers || {}) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (!(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
-  const res = await fetch(`${BASE}${path}`, { ...options, headers });
-  if (res.status === 401 && retry) {
-    try {
+  
+  try {
+    const res = await fetch(`${BASE}${path}`, { ...options, headers });
+    if (res.status === 401 && retry) {
       const refresh = getRefreshToken();
-      if (!refresh) throw new Error('No refresh');
+      if (!refresh) throw new Error('No refresh token');
       const rRes = await fetch(`${BASE}/api/auth/token/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh }) });
-      if (!rRes.ok) throw new Error('Failed');
+      if (!rRes.ok) throw new Error('Refresh failed');
       const rData = await rRes.json();
       setTokens(rData.access, null);
       return apiFetch(path, options, false);
-    } catch { clearTokens(); throw new Error('EXPIRED'); }
+    }
+    return res;
+  } catch (e) {
+    if (e.name === 'TypeError' && e.message === 'Failed to fetch') {
+      throw new Error('Connection failed. The server might be waking up or your internet is unstable. Please wait 10 seconds and try again.');
+    }
+    throw e;
   }
-  return res;
 }
 
 export async function apiLogin(email, password) {
-  const res = await fetch(`${BASE}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+  const res = await apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
   const data = await res.json(); if (!res.ok) throw new Error(data.detail || 'Login failed');
   return data;
 }
 
 export async function apiRegister(formData) {
-  const res = await fetch(`${BASE}/api/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...formData, role: 'citizen' }) });
+  const res = await apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify({ ...formData, role: 'citizen' }) });
   const data = await res.json(); if (!res.ok) throw new Error(data.detail || Object.values(data).flat().join(' '));
   return data;
 }

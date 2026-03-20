@@ -6,7 +6,7 @@ import { apiGetPublicIssues, apiGetMyIssues, apiGetWorkerTasks } from '@/lib/api
 import { Send, CheckCircle2, AlertCircle, Clock, ChevronRight, MapPin, ThumbsUp, MessageCircle, Plus, Briefcase, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com';
 
 
 const StatCard = ({ icon: Icon, label, value, color, delay }) => (

@@ -5,7 +5,7 @@ import { useCitizen } from '@/lib/CitizenContext';
 import { apiGetWorkerTasks } from '@/lib/api';
 import { CheckCircle2, Clock, AlertCircle, MapPin, Loader2, RefreshCw, Briefcase, X, ChevronRight } from 'lucide-react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com';
 
 const STATUS_CONFIG = {
   Submitted:   { color: 'bg-slate-100 text-slate-600',   dot: 'bg-slate-400',  bar: 'w-1/12 bg-slate-300' },

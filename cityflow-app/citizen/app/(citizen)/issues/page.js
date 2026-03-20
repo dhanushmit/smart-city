@@ -4,7 +4,7 @@ import { apiGetMyIssues, apiDeleteIssue } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, CheckCircle2, AlertCircle, MapPin, Search, ChevronRight, X, MessageCircle, Send, Trash2 } from 'lucide-react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com';
 
 export default function MyIssuesPage() {
   const [issues, setIssues] = useState([]);

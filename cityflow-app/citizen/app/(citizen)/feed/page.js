@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ThumbsUp, MessageCircle, MapPin, Search, ChevronDown, CheckCircle2, AlertCircle, X, Send, User, Loader2, RefreshCw } from 'lucide-react';
 import { useCitizen } from '@/lib/CitizenContext';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com';
 
 const FeedCard = ({ issue, onUpdate }) => {
   const { user } = useCitizen();

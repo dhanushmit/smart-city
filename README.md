@@ -8,8 +8,8 @@ A full-stack smart city management system built for the **Tamilnadu Government**
 
 | Service | URL |
 |---|---|
-| 🔴 Admin Dashboard | _Add Vercel URL here_ |
-| 🔵 Citizen & Worker Portal | _Add Vercel URL here_ |
+| 🔴 Admin Dashboard | https://smart-city-apn3.vercel.app |
+| 🔵 Citizen & Worker Portal | https://smart-city-sand.vercel.app |
 | ⚙️ Backend API | https://smart-city-qc23.onrender.com |
 
 ---
@@ -79,3 +79,21 @@ The Citizen & Worker Portal is packaged as an Android APK using **Web2APK Pro**,
 
 ## 👨‍💻 Built by
 **Dhanush** — Tamilnadu Government Smart City Hackathon 2026
+
+
+---
+
+## 🚀 Development & Infrastructure Tools
+
+The CityFlow platform was developed and deployed using the following modern tech stack:
+
+| Category | Tool |
+|---|---|
+| **IDE / Editor** | **Cursor** (AI-First Code Editor) |
+| **Engineering Assistant** | **Antigravity** (Powered by Google Deepmind) — AI Software Engineer Assistant |
+| **Version Control** | **Git & GitHub** |
+| **Frontend Deployment** | **Vercel** |
+| **Backend Deployment** | **Render.com** (with automatic Render wake-up logic) |
+| **Database (Production)** | **PostgreSQL** |
+| **AI Integration** | **Google Gemini AI** (Issue Detection & Codebase Development) |
+| **Mobile Integration** | **Web2APK Pro** (Native Experience) |

@@ -93,26 +93,17 @@ export default function CitizenDashboard() {
   );
 
   return (
-    <div className="pb-32 pt-6 px-1 max-w-2xl mx-auto">
+    <div className="pb-32 pt-6 px-6 md:px-10 max-w-4xl mx-auto">
       {/* Dynamic App Header */}
-      <section className="mb-10 flex items-center justify-between">
-        <div>
-           <div className="flex items-center gap-1.5 mb-1.5">
+      {/* Header Greeting */}
+      <section className="mb-10">
+           <div className="flex items-center gap-1.5 mb-2">
              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">System Operational</p>
            </div>
            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
              Hello, <span className="text-blue-600 font-black">{user?.first_name}</span>
            </h2>
-        </div>
-        <div className="flex gap-3">
-           <button className="w-14 h-14 rounded-2xl bg-white shadow-md border border-slate-100 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-all">
-              <Bell size={22} />
-           </button>
-           <div className="w-14 h-14 rounded-2xl bg-[#1e3a8a] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-100">
-              {user?.first_name?.[0]}
-           </div>
-        </div>
       </section>
 
       {/* Hero Stats Card - Redesigned for Professionalism */}

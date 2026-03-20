@@ -30,7 +30,7 @@ export default function Sidebar({ open, onClose }) {
     <>
       {open && <div className="fixed inset-0 bg-black/40 z-[60] lg:hidden backdrop-blur-sm" onClick={onClose} />}
       <aside className={`
-        fixed inset-y-0 left-0 w-72 bg-white z-[70] flex flex-col border-r border-slate-100
+        fixed inset-y-0 left-0 w-72 bg-white z-[70] flex flex-col border-r border-slate-100 pb-32 lg:pb-0
         transform transition-all duration-500 ease-in-out lg:relative
         ${open ? 'translate-x-0 lg:ml-0' : '-translate-x-full lg:translate-x-0 lg:-ml-72'}
       `}>

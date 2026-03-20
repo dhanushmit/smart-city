@@ -94,6 +94,24 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   return res.status(201).json(issue);
 });
 
+// GET single issue by ID
+router.get('/:id/', authMiddleware, async (req, res) => {
+  const db = getDb();
+  const issue = await db.get(
+    `SELECT i.*, 
+      u.first_name || ' ' || u.last_name as reported_by_name,
+      w.first_name || ' ' || w.last_name as assigned_to_name
+     FROM issues i 
+     LEFT JOIN users u ON i.reported_by = u.id
+     LEFT JOIN users w ON i.assigned_to = w.id
+     WHERE i.id = ?`,
+    [req.params.id]
+  );
+  if (!issue) return res.status(404).json({ detail: 'Issue not found' });
+  const { comments, timeline } = await getIssueAnalytics(db, issue.id);
+  return res.json({ ...issue, comments, timeline });
+});
+
 router.patch('/:id/status/', authMiddleware, async (req, res) => {
   const { status, note } = req.body;
   const db = getDb();

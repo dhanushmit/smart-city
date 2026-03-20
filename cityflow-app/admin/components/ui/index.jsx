@@ -19,9 +19,9 @@ export function Badge({ children, variant = 'default', size = 'sm' }) {
 }
 
 // ── Card ──────────────────────────────────────────────────────────────────────
-export function Card({ children, className = '' }) {
+export function Card({ children, className = '', ...props }) {
   return (
-    <div className={`bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-slate-100/60 hover:shadow-[0_12px_48px_rgba(30,58,138,0.06)] transition-all duration-500 overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-slate-100/60 hover:shadow-[0_12px_48px_rgba(30,58,138,0.06)] transition-all duration-500 overflow-hidden ${className}`} {...props}>
       {children}
     </div>
   );

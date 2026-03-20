@@ -23,6 +23,15 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Universal trailing slash remover middleware
+app.use((req, res, next) => {
+  if (req.path.substr(-1) === '/' && req.path.length > 1) {
+    const query = req.url.slice(req.path.length);
+    req.url = req.path.slice(0, -1) + query;
+  }
+  next();
+});
+
 // Serve uploaded files
 const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
 app.use('/uploads', express.static(uploadsDir));

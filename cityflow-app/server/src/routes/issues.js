@@ -58,7 +58,7 @@ router.get('/', authMiddleware, async (req, res) => {
   return res.json(results);
 });
 
-router.get('/my/issues/', authMiddleware, async (req, res) => {
+router.get('/my/issues', authMiddleware, async (req, res) => {
   const db = getDb();
   const issues = await db.all('SELECT * FROM issues WHERE reported_by = ? ORDER BY reported_at DESC', [req.userId]);
   const results = await Promise.all(issues.map(async i => {
@@ -95,7 +95,7 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
 });
 
 // GET single issue by ID
-router.get('/:id/', authMiddleware, async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
   const db = getDb();
   const issue = await db.get(
     `SELECT i.*, 
@@ -112,7 +112,7 @@ router.get('/:id/', authMiddleware, async (req, res) => {
   return res.json({ ...issue, comments, timeline });
 });
 
-router.patch('/:id/status/', authMiddleware, async (req, res) => {
+router.patch('/:id/status', authMiddleware, async (req, res) => {
   const { status, note } = req.body;
   const db = getDb();
   const issue = await db.get('SELECT * FROM issues WHERE id = ?', [req.params.id]);
@@ -124,7 +124,7 @@ router.patch('/:id/status/', authMiddleware, async (req, res) => {
   return res.json({ status: 'success' });
 });
 
-router.post('/:id/upvote/', authMiddleware, async (req, res) => {
+router.post('/:id/upvote', authMiddleware, async (req, res) => {
   const db = getDb();
   const existing = await db.get('SELECT id FROM upvotes WHERE user_id = ? AND issue_id = ?', [req.userId, req.params.id]);
   if (existing) {
@@ -138,7 +138,7 @@ router.post('/:id/upvote/', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/:id/comment/', authMiddleware, async (req, res) => {
+router.post('/:id/comment', authMiddleware, async (req, res) => {
   const { text } = req.body;
   const db = getDb();
   const result = await db.run('INSERT INTO comments (issue_id, user_id, text) VALUES (?, ?, ?) RETURNING id', [req.params.id, req.userId, text]);

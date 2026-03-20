@@ -4,7 +4,7 @@ const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/dashboard-stats/', authMiddleware, async (req, res) => {
+router.get('/dashboard-stats', authMiddleware, async (req, res) => {
   const db = getDb();
   const total = await db.get('SELECT COUNT(*) as count FROM issues');
   const high = await db.get("SELECT COUNT(*) as count FROM issues WHERE priority = 'High' AND status != 'Resolved'");
@@ -20,7 +20,7 @@ router.get('/dashboard-stats/', authMiddleware, async (req, res) => {
   });
 });
 
-router.get('/wards/', authMiddleware, async (req, res) => {
+router.get('/wards', authMiddleware, async (req, res) => {
   const db = getDb();
   const wards = ['Ward 1', 'Ward 2', 'Ward 3', 'Ward 4', 'Ward 5', 'Ward 6', 'Ward 7', 'Ward 8'];
   const result = await Promise.all(wards.map(async (w) => {
@@ -31,7 +31,7 @@ router.get('/wards/', authMiddleware, async (req, res) => {
   return res.json(result);
 });
 
-router.get('/category-trend/', authMiddleware, async (req, res) => {
+router.get('/category-trend', authMiddleware, async (req, res) => {
   const db = getDb();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
   const categories = ['Road', 'Water', 'Electricity', 'Garbage', 'Traffic'];
@@ -44,7 +44,7 @@ router.get('/category-trend/', authMiddleware, async (req, res) => {
   return res.json(result);
 });
 
-router.get('/resolution-trend/', authMiddleware, async (req, res) => {
+router.get('/resolution-trend', authMiddleware, async (req, res) => {
   const result = [
     { month: 'Jan', avgHours: 58 },
     { month: 'Feb', avgHours: 52 },
@@ -54,7 +54,7 @@ router.get('/resolution-trend/', authMiddleware, async (req, res) => {
   return res.json(result);
 });
 
-router.get('/activity-log/', authMiddleware, async (req, res) => {
+router.get('/activity-log', authMiddleware, async (req, res) => {
   const db = getDb();
   const logs = await db.all('SELECT t.*, i.display_id, i.title FROM timelines t JOIN issues i ON t.issue_id = i.id ORDER BY t.changed_at DESC LIMIT 20');
   return res.json(logs);

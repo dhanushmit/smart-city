@@ -24,7 +24,7 @@ const CATEGORY_GUESSES = ['Road', 'Garbage', 'Water', 'Electricity', 'Traffic', 
 
 // POST /api/ai/detect-issue/
 // Simulates Google Gemini Vision classifying a civic issue from an image
-router.post('/detect-issue/', authMiddleware, upload.single('image'), async (req, res) => {
+router.post('/detect-issue', authMiddleware, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ detail: 'Image required for AI detection' });
   
   await delay(2000); // Simulate Gemini processing
@@ -44,7 +44,7 @@ router.post('/detect-issue/', authMiddleware, upload.single('image'), async (req
 
 // POST /api/ai/verify-completion/:id/
 // Simulates Gemini Vision comparing Before vs After photos and grading the repair job
-router.post('/verify-completion/:id/', authMiddleware, upload.single('image'), async (req, res) => {
+router.post('/verify-completion/:id', authMiddleware, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ detail: 'Completion image required' });
   
   const db = getDb();

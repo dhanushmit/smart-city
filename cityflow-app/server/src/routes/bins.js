@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // GET /api/bins/:id/
-router.get('/:id/', authMiddleware, async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
   const db = getDb();
   const bin = await db.get('SELECT * FROM garbage_bins WHERE id = ?', [req.params.id]);
   if (!bin) return res.status(404).json({ detail: 'Bin not found' });
@@ -26,7 +26,7 @@ router.get('/:id/', authMiddleware, async (req, res) => {
 });
 
 // PATCH /api/bins/:id/ (update fill level)
-router.patch('/:id/', authMiddleware, async (req, res) => {
+router.patch('/:id', authMiddleware, async (req, res) => {
   const { fill_level } = req.body;
   const db = getDb();
   if (fill_level < 0 || fill_level > 100) return res.status(400).json({ detail: 'Invalid fill level' });

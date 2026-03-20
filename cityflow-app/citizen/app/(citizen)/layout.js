@@ -27,11 +27,11 @@ export default function DashboardLayout({ children }) {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
+    <div className="flex min-h-screen bg-[#F8FAFC]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+      <div className="flex-1 flex flex-col min-w-0 relative">
         <Navbar onOpenSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-y-auto pb-24 md:pb-6 p-4 md:p-8">
+        <main className="flex-1 p-0 sm:p-4 md:p-8 pb-32">
            {children}
         </main>
         <BottomNav />

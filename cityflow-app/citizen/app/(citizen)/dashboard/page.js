@@ -93,51 +93,63 @@ export default function CitizenDashboard() {
   );
 
   return (
-    <div className="pb-32 pt-2 px-1 max-w-lg mx-auto overflow-hidden">
+    <div className="pb-32 pt-6 px-1 max-w-2xl mx-auto">
       {/* Dynamic App Header */}
-      <section className="px-5 mb-8 flex items-center justify-between">
+      <section className="mb-10 flex items-center justify-between">
         <div>
-           <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
-              <Zap size={12} className="fill-blue-600" /> System Active
-           </p>
-           <h2 className="text-3xl font-[1000] text-gray-900 tracking-tighter leading-none">
-             Hello, {user?.first_name}
+           <div className="flex items-center gap-1.5 mb-1.5">
+             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">System Operational</p>
+           </div>
+           <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
+             Hello, <span className="text-blue-600 font-black">{user?.first_name}</span>
            </h2>
         </div>
-        <div className="flex gap-2">
-           <button className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors">
-              <Bell size={20} />
+        <div className="flex gap-3">
+           <button className="w-14 h-14 rounded-2xl bg-white shadow-md border border-slate-100 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-all">
+              <Bell size={22} />
            </button>
-           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center text-white font-black shadow-lg shadow-indigo-100">
+           <div className="w-14 h-14 rounded-2xl bg-[#1e3a8a] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-100">
               {user?.first_name?.[0]}
            </div>
         </div>
       </section>
 
-      {/* Hero Stats Card */}
-      <section className="px-5 mb-10 overflow-visible">
+      {/* Hero Stats Card - Redesigned for Professionalism */}
+      <section className="mb-12">
          <motion.div 
            initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-           className="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-[40px] p-8 text-white relative shadow-2xl shadow-indigo-200 overflow-hidden"
+           className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-[0_20px_60px_rgba(0,0,0,0.02)] relative overflow-hidden"
          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[100px] rounded-full -mr-32 -mt-32" />
-            <div className="relative z-10 flex justify-between items-center mb-8">
+            <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
+            
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200 opacity-80 mb-2">My Ward Impact</p>
-                  <p className="text-4xl font-[900] tracking-tighter leading-none">{user?.ward}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-600 mb-2">Authenticated Ward</p>
+                  <p className="text-5xl font-black text-gray-900 tracking-tighter tabular-nums">{user?.ward}</p>
                </div>
-               <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20">
-                  <Shield size={28} className="text-white fill-white/10" />
+               <div className="flex items-center gap-2 px-6 py-4 bg-blue-50 rounded-3xl border border-blue-100/50">
+                  <Shield size={24} className="text-blue-600" />
+                  <span className="text-xs font-bold text-blue-700 uppercase tracking-widest">Certified Resident</span>
                </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-               <div className="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/10">
-                  <p className="text-[9px] font-black uppercase text-indigo-100/60 tracking-widest leading-none mb-1 text-center">Active Issues</p>
-                  <p className="text-2xl font-black text-white text-center">{publicIssues.filter(i => i.ward === user?.ward && i.status !== 'Resolved').length}</p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-gray-50">
+               <div className="space-y-1">
+                  <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Active Reports</p>
+                  <p className="text-3xl font-black text-gray-900 tabular-nums">{publicIssues.filter(i => i.ward === user?.ward && i.status !== 'Resolved').length}</p>
                </div>
-               <div className="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/10">
-                  <p className="text-[9px] font-black uppercase text-indigo-100/60 tracking-widest leading-none mb-1 text-center">Score Contribution</p>
-                  <p className="text-2xl font-black text-white text-center">980</p>
+               <div className="space-y-1">
+                  <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Impact Score</p>
+                  <p className="text-3xl font-black text-blue-600 tabular-nums">980</p>
+               </div>
+               <div className="space-y-1 hidden md:block">
+                  <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Resolved</p>
+                  <p className="text-3xl font-black text-emerald-600 tabular-nums">12</p>
+               </div>
+               <div className="space-y-1 hidden md:block">
+                   <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Contribution</p>
+                   <p className="text-3xl font-black text-amber-500 tabular-nums">Gold</p>
                </div>
             </div>
          </motion.div>
@@ -154,12 +166,17 @@ export default function CitizenDashboard() {
       </section>
 
       {/* Activity Sections */}
-      <section className="px-5 space-y-8">
+      <section className="space-y-8">
          <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-               <span className="w-1.5 h-10 bg-blue-600 rounded-full" /> {isWorker ? 'Assigned' : 'Recent'} Reports
-            </h3>
-            <Link href={isWorker ? "/tasks" : "/issues"} className="text-[10px] font-black bg-slate-100 px-4 py-2 rounded-full uppercase tracking-widest text-gray-400">View All</Link>
+            <div className="flex items-center gap-3">
+               <div className="w-1.5 h-8 bg-blue-600 rounded-full" />
+               <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                  {isWorker ? 'Allocated Tasks' : 'Recent Filings'}
+               </h3>
+            </div>
+            <Link href={isWorker ? "/tasks" : "/issues"} className="text-[11px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest bg-blue-50 px-4 py-2 rounded-xl transition-colors">
+               Explore All
+            </Link>
          </div>
 
          <div className="space-y-4">

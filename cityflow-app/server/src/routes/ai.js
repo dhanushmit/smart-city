@@ -66,7 +66,7 @@ router.post('/verify-completion/:id/', authMiddleware, upload.single('image'), a
   
   // Save AI score and resolution into the database
   await db.run(
-    'UPDATE issues SET status = "Resolved", completion_photo = ?, ai_completion_score = ?, resolved_at = ? WHERE id = ?',
+    "UPDATE issues SET status = 'Resolved', completion_photo = ?, ai_completion_score = ?, resolved_at = ? WHERE id = ?",
     [completionPhoto, score, new Date().toISOString(), req.params.id]
   );
   

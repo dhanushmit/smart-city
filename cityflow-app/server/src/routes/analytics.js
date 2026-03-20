@@ -7,9 +7,9 @@ const router = express.Router();
 router.get('/dashboard-stats/', authMiddleware, async (req, res) => {
   const db = getDb();
   const total = await db.get('SELECT COUNT(*) as count FROM issues');
-  const high = await db.get('SELECT COUNT(*) as count FROM issues WHERE priority = "High" AND status != "Resolved"');
+  const high = await db.get("SELECT COUNT(*) as count FROM issues WHERE priority = 'High' AND status != 'Resolved'");
   const bins = await db.get('SELECT COUNT(*) as count FROM garbage_bins WHERE fill_level >= 90');
-  const workers = await db.get('SELECT COUNT(*) as count FROM users WHERE role = "worker"');
+  const workers = await db.get("SELECT COUNT(*) as count FROM users WHERE role = 'worker'");
   
   return res.json({
     total_issues: total.count || 0,
@@ -24,8 +24,8 @@ router.get('/wards/', authMiddleware, async (req, res) => {
   const db = getDb();
   const wards = ['Ward 1', 'Ward 2', 'Ward 3', 'Ward 4', 'Ward 5', 'Ward 6', 'Ward 7', 'Ward 8'];
   const result = await Promise.all(wards.map(async (w) => {
-    const resolved = await db.get('SELECT COUNT(*) as count FROM issues WHERE ward = ? AND status = "Resolved"', [w]);
-    const pending = await db.get('SELECT COUNT(*) as count FROM issues WHERE ward = ? AND status != "Resolved"', [w]);
+    const resolved = await db.get("SELECT COUNT(*) as count FROM issues WHERE ward = ? AND status = 'Resolved'", [w]);
+    const pending = await db.get("SELECT COUNT(*) as count FROM issues WHERE ward = ? AND status != 'Resolved'", [w]);
     return { id: w, name: w, resolved: resolved.count || 0, pending: pending.count || 0 };
   }));
   return res.json(result);

@@ -75,7 +75,7 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
 
   const result = await db.run(`
     INSERT INTO issues (title, description, category, ward, location_text, location_lat, location_lng, image_url, reported_by, is_public)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
   `, [title, description, category || 'Road', ward || '', location_text || '', location_lat || 0, location_lng || 0, imageUrl, req.userId, is_public === 'false' ? 0 : 1]);
 
   const issueId = result.lastID;
@@ -84,9 +84,9 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   await db.run('INSERT INTO timelines (issue_id, status, note, changed_by) VALUES (?, ?, ?, ?)', [issueId, 'Submitted', 'Issue reported and recorded.', req.userId]);
 
   // Auto-assign worker
-  const worker = await db.get('SELECT id FROM users WHERE role = "worker" AND ward = ? LIMIT 1', [ward]);
+  const worker = await db.get("SELECT id FROM users WHERE role = 'worker' AND ward = ? LIMIT 1", [ward]);
   if (worker) {
-    await db.run('UPDATE issues SET assigned_to = ?, status = "Assigned" WHERE id = ?', [worker.id, issueId]);
+    await db.run("UPDATE issues SET assigned_to = ?, status = 'Assigned' WHERE id = ?", [worker.id, issueId]);
     await db.run('INSERT INTO timelines (issue_id, status, note, changed_by) VALUES (?, ?, ?, ?)', [issueId, 'Assigned', 'Automatically assigned to ward worker.', null]);
   }
 
@@ -141,8 +141,8 @@ router.post('/:id/upvote/', authMiddleware, async (req, res) => {
 router.post('/:id/comment/', authMiddleware, async (req, res) => {
   const { text } = req.body;
   const db = getDb();
-  const result = await db.run('INSERT INTO comments (issue_id, user_id, text) VALUES (?, ?, ?)', [req.params.id, req.userId, text]);
-  const comment = await db.get('SELECT c.*, u.first_name || " " || u.last_name as user_name FROM comments c JOIN users u ON c.user_id = u.id WHERE c.id = ?', [result.lastID]);
+  const result = await db.run('INSERT INTO comments (issue_id, user_id, text) VALUES (?, ?, ?) RETURNING id', [req.params.id, req.userId, text]);
+  const comment = await db.get("SELECT c.*, u.first_name || ' ' || u.last_name as user_name FROM comments c JOIN users u ON c.user_id = u.id WHERE c.id = ?", [result.lastID]);
   return res.json(comment);
 });
 

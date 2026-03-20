@@ -1,26 +1,52 @@
-const sqlite3 = require('sqlite3');
-const { open } = require('sqlite');
-const path = require('path');
+const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
-let _db = null;
+let _pool = null;
+
+// PostgreSQL pool wrapper that mimics the SQLite API (get, all, run)
+function createDbWrapper(pool) {
+  return {
+    get: async (query, params = []) => {
+      const q = convertQuery(query);
+      const res = await pool.query(q, params);
+      return res.rows[0] || null;
+    },
+    all: async (query, params = []) => {
+      const q = convertQuery(query);
+      const res = await pool.query(q, params);
+      return res.rows;
+    },
+    run: async (query, params = []) => {
+      const q = convertQuery(query);
+      const res = await pool.query(q, params);
+      return { lastID: res.rows[0]?.id || null, changes: res.rowCount };
+    },
+    exec: async (query) => {
+      await pool.query(query);
+    },
+  };
+}
+
+// Convert SQLite ? placeholders to PostgreSQL $1, $2...
+function convertQuery(query) {
+  let i = 0;
+  return query.replace(/\?/g, () => `$${++i}`);
+}
 
 async function initDb() {
-  if (_db) return _db;
-  const dbPath = path.join(__dirname, '../../cityflow.db');
-  
-  _db = await open({
-    filename: dbPath,
-    driver: sqlite3.Database
+  if (_pool) return createDbWrapper(_pool);
+
+  _pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
   });
 
-  // Enable foreign keys
-  await _db.exec('PRAGMA foreign_keys = ON;');
+  const db = createDbWrapper(_pool);
 
-  // Create tables if they don't exist
-  await _db.exec(`
+  // Create all tables
+  await _pool.query(`
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       display_id TEXT UNIQUE,
       username TEXT UNIQUE NOT NULL,
       email TEXT UNIQUE NOT NULL,
@@ -36,12 +62,12 @@ async function initDb() {
       street TEXT DEFAULT '',
       landmark TEXT DEFAULT '',
       profile_photo TEXT,
-      joined_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+      joined_date TIMESTAMPTZ DEFAULT NOW(),
       is_active INTEGER DEFAULT 1
     );
 
     CREATE TABLE IF NOT EXISTS issues (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       display_id TEXT UNIQUE,
       title TEXT NOT NULL,
       description TEXT,
@@ -56,87 +82,86 @@ async function initDb() {
       completion_photo TEXT,
       ai_completion_score INTEGER,
       ai_completion_verdict TEXT,
-      reported_by INTEGER NOT NULL,
-      assigned_to INTEGER,
+      reported_by INTEGER NOT NULL REFERENCES users(id),
+      assigned_to INTEGER REFERENCES users(id),
       is_public INTEGER DEFAULT 1,
       upvotes INTEGER DEFAULT 0,
-      reported_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      resolved_at DATETIME,
-      FOREIGN KEY (reported_by) REFERENCES users(id),
-      FOREIGN KEY (assigned_to) REFERENCES users(id)
+      reported_at TIMESTAMPTZ DEFAULT NOW(),
+      resolved_at TIMESTAMPTZ
     );
 
     CREATE TABLE IF NOT EXISTS comments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      issue_id INTEGER NOT NULL,
-      user_id INTEGER NOT NULL,
+      id SERIAL PRIMARY KEY,
+      issue_id INTEGER NOT NULL REFERENCES issues(id),
+      user_id INTEGER NOT NULL REFERENCES users(id),
       text TEXT NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (issue_id) REFERENCES issues(id),
-      FOREIGN KEY (user_id) REFERENCES users(id)
+      created_at TIMESTAMPTZ DEFAULT NOW()
     );
 
     CREATE TABLE IF NOT EXISTS timelines (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      issue_id INTEGER NOT NULL,
+      id SERIAL PRIMARY KEY,
+      issue_id INTEGER NOT NULL REFERENCES issues(id),
       status TEXT NOT NULL,
       note TEXT,
-      changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      changed_by INTEGER,
-      FOREIGN KEY (issue_id) REFERENCES issues(id),
-      FOREIGN KEY (changed_by) REFERENCES users(id)
+      changed_at TIMESTAMPTZ DEFAULT NOW(),
+      changed_by INTEGER REFERENCES users(id)
     );
 
     CREATE TABLE IF NOT EXISTS upvotes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      issue_id INTEGER NOT NULL,
-      UNIQUE(user_id, issue_id),
-      FOREIGN KEY (user_id) REFERENCES users(id),
-      FOREIGN KEY (issue_id) REFERENCES issues(id)
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      issue_id INTEGER NOT NULL REFERENCES issues(id),
+      UNIQUE(user_id, issue_id)
     );
 
     CREATE TABLE IF NOT EXISTS garbage_bins (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       bin_id TEXT UNIQUE,
       ward TEXT DEFAULT '',
       location_lat REAL,
       location_lng REAL,
       location_text TEXT DEFAULT '',
       fill_level INTEGER DEFAULT 0,
-      last_collected DATETIME DEFAULT CURRENT_TIMESTAMP
+      last_collected TIMESTAMPTZ DEFAULT NOW()
     );
   `);
 
-  try { await _db.exec("ALTER TABLE issues ADD COLUMN ai_completion_score INTEGER;"); } catch (e) {}
-  try { await _db.exec("ALTER TABLE issues ADD COLUMN ai_completion_verdict TEXT;"); } catch (e) {}
-
-  // Auto-seed required login accounts if they don't exist individually
-  const adminCheck = await _db.get('SELECT id FROM users WHERE email = ?', ['admin@cityflow.gov.in']);
+  // Auto-seed default accounts
+  const adminCheck = await db.get('SELECT id FROM users WHERE email = ?', ['admin@cityflow.gov.in']);
   if (!adminCheck) {
-    console.log('🌱 Admin account missing. Auto-seeding...');
+    console.log('🌱 Seeding admin account...');
     const hp = await bcrypt.hash('admin123', 10);
-    await _db.run(`INSERT INTO users (display_id, username, email, password_hash, first_name, last_name, role) VALUES (?, ?, ?, ?, ?, ?, ?)`, ['ADM-1', 'admin_1', 'admin@cityflow.gov.in', hp, 'System', 'Admin', 'admin']);
+    await _pool.query(
+      `INSERT INTO users (display_id, username, email, password_hash, first_name, last_name, role) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING`,
+      ['ADM-1', 'admin_1', 'admin@cityflow.gov.in', hp, 'System', 'Admin', 'admin']
+    );
   }
 
-  const citizenCheck = await _db.get('SELECT id FROM users WHERE email = ?', ['citizen1@example.com']);
+  const citizenCheck = await db.get('SELECT id FROM users WHERE email = ?', ['citizen1@example.com']);
   if (!citizenCheck) {
     const cp = await bcrypt.hash('citizen123', 10);
-    await _db.run(`INSERT INTO users (display_id, username, email, password_hash, first_name, last_name, role, ward) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, ['CIT-1', 'citizen_1', 'citizen1@example.com', cp, 'John', 'Citizen', 'citizen', 'Ward 1']);
+    await _pool.query(
+      `INSERT INTO users (display_id, username, email, password_hash, first_name, last_name, role, ward) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING`,
+      ['CIT-1', 'citizen_1', 'citizen1@example.com', cp, 'John', 'Citizen', 'citizen', 'Ward 1']
+    );
   }
 
-  const workerCheck = await _db.get('SELECT id FROM users WHERE email = ?', ['worker1@smartcity.com']);
+  const workerCheck = await db.get('SELECT id FROM users WHERE email = ?', ['worker1@smartcity.com']);
   if (!workerCheck) {
     const wp = await bcrypt.hash('worker123', 10);
-    await _db.run(`INSERT INTO users (display_id, username, email, password_hash, first_name, last_name, role, ward) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, ['WRK-1', 'worker_1', 'worker1@smartcity.com', wp, 'Bob', 'Worker', 'worker', 'Ward 1']);
+    await _pool.query(
+      `INSERT INTO users (display_id, username, email, password_hash, first_name, last_name, role, ward) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING`,
+      ['WRK-1', 'worker_1', 'worker1@smartcity.com', wp, 'Bob', 'Worker', 'worker', 'Ward 1']
+    );
   }
 
-  return _db;
+  console.log('✅ PostgreSQL connected & tables ready');
+  return db;
 }
 
 function getDb() {
-  if (!_db) throw new Error('Database not initialized. Call initDb() first.');
-  return _db;
+  if (!_pool) throw new Error('Database not initialized. Call initDb() first.');
+  return createDbWrapper(_pool);
 }
 
 module.exports = { initDb, getDb };

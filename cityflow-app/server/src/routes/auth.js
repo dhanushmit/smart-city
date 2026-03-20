@@ -6,7 +6,7 @@ const { generateToken, authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 async function getUserById(db, id) {
-  return await db.get('SELECT * FROM users WHERE id = ?', [id]);
+  return await db.get('SELECT * FROM users WHERE id = $1', [id]);
 }
 
 function userResponse(u) {
@@ -33,7 +33,7 @@ function userResponse(u) {
 }
 
 // POST /api/auth/login/
-router.post('/login/', async (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ detail: 'Email and password are required.' });
   const db = getDb();
@@ -48,7 +48,7 @@ router.post('/login/', async (req, res) => {
 });
 
 // POST /api/auth/register/
-router.post('/register/', async (req, res) => {
+router.post('/register', async (req, res) => {
   const { email, username, password, first_name, last_name, role, ward, phone, category } = req.body;
   if (!email || !password || !username) return res.status(400).json({ detail: 'email, username, password are required.' });
   const db = getDb();
@@ -59,7 +59,7 @@ router.post('/register/', async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
   const result = await db.run(`
     INSERT INTO users (username, email, password_hash, first_name, last_name, role, ward, phone, category)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
   `, [username, email, hash, first_name || '', last_name || '', role || 'citizen', ward || '', phone || '', category || '']);
 
   const userId = result.lastID;
@@ -73,7 +73,7 @@ router.post('/register/', async (req, res) => {
 });
 
 // GET /api/auth/me/
-router.get('/me/', authMiddleware, async (req, res) => {
+router.get('/me', authMiddleware, async (req, res) => {
   const db = getDb();
   const user = await getUserById(db, req.userId);
   if (!user) return res.status(404).json({ detail: 'User not found.' });
@@ -81,7 +81,7 @@ router.get('/me/', authMiddleware, async (req, res) => {
 });
 
 // GET /api/auth/workers/
-router.get('/workers/', authMiddleware, async (req, res) => {
+router.get('/workers', authMiddleware, async (req, res) => {
   if (req.userRole !== 'admin') return res.status(403).json({ detail: 'Forbidden' });
   const db = getDb();
   const workers = await db.all('SELECT * FROM users WHERE role = ?', ['worker']);
@@ -104,7 +104,7 @@ router.get('/workers/', authMiddleware, async (req, res) => {
 });
 
 // GET /api/auth/workers/:id/
-router.get('/workers/:id/', authMiddleware, async (req, res) => {
+router.get('/workers/:id', authMiddleware, async (req, res) => {
   if (req.userRole !== 'admin') return res.status(403).json({ detail: 'Forbidden' });
   const db = getDb();
   const w = await db.get('SELECT * FROM users WHERE id = ? AND role = ?', [req.params.id, 'worker']);
@@ -120,7 +120,7 @@ router.get('/workers/:id/', authMiddleware, async (req, res) => {
 });
 
 // POST /api/auth/change-password/
-router.post('/change-password/', authMiddleware, async (req, res) => {
+router.post('/change-password', authMiddleware, async (req, res) => {
   const { current_password, new_password } = req.body;
   if (!current_password || !new_password) return res.status(400).json({ detail: 'current_password and new_password are required.' });
   const db = getDb();
@@ -135,7 +135,7 @@ router.post('/change-password/', authMiddleware, async (req, res) => {
 });
 
 // PATCH /api/auth/profile/
-router.patch('/profile/', authMiddleware, async (req, res) => {
+router.patch('/profile', authMiddleware, async (req, res) => {
   const { first_name, last_name, ward, gender, dob, street, landmark } = req.body;
   const db = getDb();
   await db.run(`
@@ -148,7 +148,7 @@ router.patch('/profile/', authMiddleware, async (req, res) => {
 });
 
 // POST /api/auth/token/refresh/
-router.post('/token/refresh/', (req, res) => {
+router.post('/token/refresh', (req, res) => {
   const { refresh } = req.body;
   if (!refresh) return res.status(400).json({ detail: 'Refresh token required.' });
   try {
@@ -162,15 +162,15 @@ router.post('/token/refresh/', (req, res) => {
 });
 
 // GET /api/auth/users/ (Fetch all Citizens & Workers)
-router.get('/users/', authMiddleware, async (req, res) => {
+router.get('/users', authMiddleware, async (req, res) => {
   if (req.userRole !== 'admin') return res.status(403).json({ detail: 'Forbidden' });
   const db = getDb();
-  const usersList = await db.all('SELECT * FROM users WHERE role IN ("worker", "citizen")');
+  const usersList = await db.all("SELECT * FROM users WHERE role IN ('worker', 'citizen')");
   return res.json(usersList.map(userResponse));
 });
 
 // PATCH /api/auth/users/:id/ (Admin Edit User/Worker)
-router.patch('/users/:id/', authMiddleware, async (req, res) => {
+router.patch('/users/:id', authMiddleware, async (req, res) => {
   if (req.userRole !== 'admin') return res.status(403).json({ detail: 'Forbidden' });
   const { first_name, last_name, email, password, phone, ward, category } = req.body;
   const db = getDb();
@@ -194,7 +194,7 @@ router.patch('/users/:id/', authMiddleware, async (req, res) => {
 });
 
 // DELETE /api/auth/users/:id/
-router.delete('/users/:id/', authMiddleware, async (req, res) => {
+router.delete('/users/:id', authMiddleware, async (req, res) => {
   if (req.userRole !== 'admin') return res.status(403).json({ detail: 'Forbidden' });
   const db = getDb();
   const target = await getUserById(db, req.params.id);

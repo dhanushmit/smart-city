@@ -12,7 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className="antialiased selection:bg-blue-100 selection:text-blue-900">
         <CitizenProvider>
           {children}
         </CitizenProvider>

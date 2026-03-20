@@ -72,47 +72,47 @@ export default function TaskConsolePage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto pb-32 pt-2 px-4 space-y-8">
+    <div className="max-w-2xl mx-auto pb-32 pt-6 px-5 space-y-10">
       {/* Premium Officer Header */}
       <section className="flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
-            <TrendingUp size={12} /> Live Performance
+          <p className="text-[11px] font-bold text-blue-600 uppercase tracking-[0.15em] mb-2 flex items-center gap-2">
+            <TrendingUp size={14} strokeWidth={2.5} /> Live Performance
           </p>
-          <h2 className="text-3xl font-[1000] text-gray-900 tracking-tighter leading-none">Task Console</h2>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">Task Console</h2>
         </div>
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => loadTasks(true)} disabled={refreshing}
-          className="w-12 h-12 bg-white shadow-sm border border-slate-100 rounded-2xl flex items-center justify-center text-blue-600"
+          className="w-14 h-14 bg-white shadow-md border border-slate-100 rounded-2xl flex items-center justify-center text-blue-600 hover:shadow-xl transition-all"
         >
-          <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+          <RefreshCw size={20} className={refreshing ? 'animate-spin' : ''} />
         </motion.button>
       </section>
 
       {/* Stats Summary Chips */}
-      <div className="grid grid-cols-3 gap-3">
-         <div className="bg-blue-600 rounded-[24px] p-4 text-white shadow-lg shadow-blue-100">
-            <p className="text-[8px] font-black uppercase tracking-widest opacity-70 mb-1">Queue</p>
-            <p className="text-xl font-black">{counts.All}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+         <div className="bg-blue-600 rounded-[32px] p-6 text-white shadow-xl shadow-blue-100/50 flex flex-col justify-between min-h-[120px]">
+            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Assignment Queue</p>
+            <p className="text-4xl font-black tabular-nums">{counts.All}</p>
          </div>
-         <div className="bg-amber-500 rounded-[24px] p-4 text-white shadow-lg shadow-amber-100">
-            <p className="text-[8px] font-black uppercase tracking-widest opacity-70 mb-1">Active</p>
-            <p className="text-xl font-black">{counts['In Progress']}</p>
+         <div className="bg-amber-500 rounded-[32px] p-6 text-white shadow-xl shadow-amber-100/50 flex flex-col justify-between min-h-[120px]">
+            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Active Mission</p>
+            <p className="text-4xl font-black tabular-nums">{counts['In Progress']}</p>
          </div>
-         <div className="bg-emerald-500 rounded-[24px] p-4 text-white shadow-lg shadow-emerald-100">
-            <p className="text-[8px] font-black uppercase tracking-widest opacity-70 mb-1">Solved</p>
-            <p className="text-xl font-black">{counts.Resolved}</p>
+         <div className="bg-emerald-500 rounded-[32px] p-6 text-white shadow-xl shadow-emerald-100/50 flex flex-col justify-between min-h-[120px]">
+            <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Completed</p>
+            <p className="text-4xl font-black tabular-nums">{counts.Resolved}</p>
          </div>
       </div>
 
       {/* Filter Segmented Control */}
-      <div className="bg-slate-100/50 p-1.5 rounded-[24px] flex gap-1 border border-slate-100">
+      <div className="bg-slate-100/80 p-1.5 rounded-[28px] flex gap-1 border border-slate-200/50 backdrop-blur-sm">
         {['All', 'Assigned', 'In Progress', 'Resolved'].map(f => (
           <button
             key={f} onClick={() => setFilter(f)}
-            className={`flex-1 py-3 px-1 rounded-[20px] text-[9px] font-black uppercase tracking-widest transition-all
-              ${filter === f ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400'}`}
+            className={`flex-1 py-3.5 px-2 rounded-[22px] text-[10px] font-bold uppercase tracking-wider transition-all
+              ${filter === f ? 'bg-white text-blue-600 shadow-lg shadow-blue-500/5' : 'text-gray-500 hover:text-gray-700'}`}
           >
             {f === 'In Progress' ? 'Active' : f}
           </button>

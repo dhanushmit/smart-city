@@ -16,20 +16,20 @@ const PIE_COLORS = ['#2563eb', '#0ea5e9', '#f59e0b', '#16a34a', '#8b5cf6', '#ec4
 
 function KpiCard({ title, value, sub, icon: Icon, color, trend }) {
   return (
-    <Card className="p-5">
+    <Card className="p-4 md:p-5">
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-gray-500 font-medium">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
-          {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+        <div className="min-w-0">
+          <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">{title}</p>
+          <p className="text-2xl md:text-3xl font-extrabold text-gray-900 mt-1.5 tabular-nums tracking-tight">{value}</p>
+          {sub && <p className="text-[10px] text-gray-400 mt-1 font-medium truncate">{sub}</p>}
         </div>
-        <div className={`p-3 rounded-xl ${color}`}>
-          <Icon size={22} className="text-white" />
+        <div className={`p-2.5 rounded-xl ${color} flex-shrink-0 shadow-sm shadow-black/5`}>
+          <Icon size={20} className="text-white" />
         </div>
       </div>
       {trend !== undefined && (
-        <div className="mt-3 flex items-center gap-1 text-green-600 text-xs font-medium">
-          <TrendingUp size={13} />
+        <div className="mt-4 flex items-center gap-1.5 text-green-600 text-xs font-bold bg-green-50 w-fit px-2 py-0.5 rounded-full">
+          <TrendingUp size={12} />
           <span>{trend}</span>
         </div>
       )}
@@ -79,7 +79,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <KpiCard title="Total Issues" value={total} sub="All time" icon={AlertCircle} color="bg-blue-600" trend="+4 today" />
         <KpiCard title="High Priority" value={highPriority} sub="Needs attention" icon={Activity} color="bg-red-500" />
         <KpiCard title="Avg Resolution" value={avgResolution} sub="Resolved issues" icon={Clock} color="bg-orange-500" trend="↓ 2h vs last week" />
@@ -87,30 +87,30 @@ export default function DashboardPage() {
       </div>
 
       {/* Second row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5 col-span-2 lg:col-span-1">
-          <p className="text-sm text-gray-500 font-medium">Resolved Today</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{resolved}</p>
-          <p className="text-xs text-gray-400 mt-1">Closed + Resolved</p>
-          <div className="mt-3 flex items-center gap-1 text-green-600 text-xs font-medium">
-            <CheckCircle2 size={13} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <Card className="p-5">
+          <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Resolved Today</p>
+          <p className="text-3xl font-extrabold text-gray-900 mt-1.5 tabular-nums">{resolved}</p>
+          <p className="text-[10px] text-gray-400 mt-1 font-medium">Closed + Resolved</p>
+          <div className="mt-4 flex items-center gap-1.5 text-green-600 text-[10px] font-bold bg-green-50 w-fit px-2 py-0.5 rounded-full">
+            <CheckCircle2 size={12} />
             <span>+3 from yesterday</span>
           </div>
         </Card>
-        <Card className="p-5 col-span-2 lg:col-span-1">
-          <p className="text-sm text-gray-500 font-medium">Garbage Overflow</p>
-          <p className="text-3xl font-bold text-red-600 mt-1">{overflowBins}</p>
-          <p className="text-xs text-gray-400 mt-1">Bins need immediate action</p>
-          <div className="mt-3 flex items-center gap-1 text-red-500 text-xs font-medium">
-            <Trash2 size={13} />
-            <span>Requires attention</span>
+        <Card className="p-5">
+          <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Garbage Overflow</p>
+          <p className="text-3xl font-extrabold text-red-600 mt-1.5 tabular-nums">{overflowBins}</p>
+          <p className="text-[10px] text-gray-400 mt-1 font-medium">Bins need quick action</p>
+          <div className="mt-4 flex items-center gap-1.5 text-red-500 text-[10px] font-bold bg-red-50 w-fit px-2 py-0.5 rounded-full">
+            <Trash2 size={12} />
+            <span>Immediate attention</span>
           </div>
         </Card>
 
-        <Card className="p-5 col-span-2 lg:col-span-2">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-800">Urgent Unassigned Issues</h3>
-            <span className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded-full font-medium">{urgent.length} issues</span>
+        <Card className="p-5 md:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-tight">Urget Unassigned</h3>
+            <span className="text-[10px] text-red-600 bg-red-50 px-2 py-1 rounded-full font-bold uppercase tracking-wider">{urgent.length} Alert</span>
           </div>
           <div className="space-y-2">
             {urgent.slice(0, 3).map(issue => (

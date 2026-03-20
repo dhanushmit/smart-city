@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }) {
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0 relative">
         <Navbar onOpenSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 p-0 sm:p-4 md:p-8 pb-32">
+        <main className="flex-1 p-0 pb-32">
            {children}
         </main>
         <BottomNav />

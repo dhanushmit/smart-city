@@ -1,4 +1,4 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com';
+const BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 // ── Token helpers ─────────────────────────────────────────────────────────────
 export const getAccessToken = () => {

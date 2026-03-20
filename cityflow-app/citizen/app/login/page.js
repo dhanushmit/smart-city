@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCitizen } from '@/lib/CitizenContext';
 import { useRouter } from 'next/navigation';
-import { Shield, Loader2, ArrowLeft, Mail, Lock } from 'lucide-react';
+import { Shield, Loader2, ArrowLeft, Mail, Lock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LoginPage() {
   const { login, user } = useCitizen();
@@ -13,12 +13,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
-  const [waking, setWaking]       = useState(false);
+  const [waking, setWaking]     = useState(false);
 
   useEffect(() => {
     // Hidden "morning call" to wake up Render (30s on free tier)
     const wakeUp = async () => {
-      try { await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com'}/api/health`); } catch (e) {}
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) return;
+
+      setWaking(true);
+      try { 
+        await fetch(`${apiUrl}/api/health`); 
+      } catch (e) {
+        console.warn('Wake-up ping failed', e);
+      } finally {
+        setTimeout(() => setWaking(false), 2000);
+      }
     };
     wakeUp();
   }, []);
@@ -62,6 +72,20 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Portal Sign In</h1>
             <p className="text-gray-500 text-sm mt-1 font-medium italic">Authorized for Citizens & Workers</p>
           </div>
+
+          <AnimatePresence>
+            {waking && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, height: 0 }}
+                className="bg-blue-50 border border-blue-100/50 text-blue-600 text-[10px] font-bold uppercase tracking-widest rounded-xl px-4 py-2.5 mb-6 flex items-center justify-center gap-2"
+              >
+                <Sparkles size={12} className="animate-pulse" />
+                Waking up city server...
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {error && (
             <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-2xl px-4 py-3 mb-6 font-medium animate-shake">

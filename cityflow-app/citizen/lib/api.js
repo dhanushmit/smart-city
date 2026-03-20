@@ -1,4 +1,4 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com';
+const BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const getAccessToken = () => { if (typeof window === 'undefined') return null; return localStorage.getItem('cf_access_cit'); };
 export const getRefreshToken = () => { if (typeof window === 'undefined') return null; return localStorage.getItem('cf_refresh_cit'); };

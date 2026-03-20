@@ -1,8 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { useRouter } from 'next/navigation';
-import { Shield, Loader2 } from 'lucide-react';
+import { Shield, Loader2, Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, user } = useApp();
@@ -11,11 +11,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [waking, setWaking]     = useState(false);
 
   useEffect(() => {
     // Wake up Render (free tier sleep fix)
     const ping = async () => {
-      try { await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://smart-city-qc23.onrender.com'}/api/health`); } catch (e) {}
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) return;
+
+      setWaking(true);
+      try { 
+        await fetch(`${apiUrl}/api/health`); 
+      } catch (e) {
+        console.warn('Wake-up ping failed', e);
+      } finally {
+        // Keep the "waking" state for a moment to feel smooth
+        setTimeout(() => setWaking(false), 2000);
+      }
     };
     ping();
   }, []);
@@ -52,6 +64,13 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <h2 className="text-lg font-bold text-gray-900 mb-1">Admin Sign In</h2>
           <p className="text-gray-400 text-sm mb-6">Restricted access — authorised personnel only</p>
+
+          {waking && (
+            <div className="bg-blue-600/10 border border-blue-500/20 text-blue-700 text-[11px] font-bold uppercase tracking-widest rounded-lg px-4 py-2 mb-5 flex items-center justify-center gap-2 animate-pulse">
+              <Sparkles size={12} />
+              Waking up city server...
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-5">

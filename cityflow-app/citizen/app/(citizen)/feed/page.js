@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react';
 import { apiGetPublicIssues, apiUpvoteIssue, apiAddComment } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThumbsUp, MessageCircle, MapPin, Search, ChevronDown, CheckCircle2, AlertCircle, X, Send, User } from 'lucide-react';
+import { ThumbsUp, MessageCircle, MapPin, Search, ChevronDown, CheckCircle2, AlertCircle, X, Send, User, Loader2, RefreshCw } from 'lucide-react';
 import { useCitizen } from '@/lib/CitizenContext';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const FeedCard = ({ issue, onUpdate }) => {
   const { user } = useCitizen();
@@ -59,7 +61,7 @@ const FeedCard = ({ issue, onUpdate }) => {
 
         {issue.image_url && (
           <div className="w-full h-48 rounded-[28px] overflow-hidden border border-slate-50 mb-4 shadow-sm">
-             <img src={`http://localhost:5000${issue.image_url}`} alt="" className="w-full h-full object-cover" />
+             <img src={`${API_BASE}${issue.image_url}`} alt="" className="w-full h-full object-cover" />
           </div>
         )}
 
@@ -153,9 +155,23 @@ export default function FeedPage() {
   const [issues, setIssues] = useState([]);
   const [cat, setCat] = useState('All');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadIssues = async (silent = false) => {
+    if (!silent) setLoading(true);
+    else setRefreshing(true);
+    try {
+      const d = await apiGetPublicIssues();
+      setIssues(Array.isArray(d) ? d : []);
+    } catch(e) { console.error(e); }
+    finally { setLoading(false); setRefreshing(false); }
+  };
 
   useEffect(() => {
-    apiGetPublicIssues().then(d => { setIssues(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => setLoading(false));
+    loadIssues();
+    // Auto-refresh every 30 seconds for live updates
+    const interval = setInterval(() => loadIssues(true), 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const updateIssue = (id, updates) => {
@@ -169,6 +185,14 @@ export default function FeedPage() {
       <header className="mb-10 text-center">
          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Public Feed</h2>
          <p className="text-gray-400 font-medium mt-1">Witness real-time city transformation from fellow citizens.</p>
+         <button
+           onClick={() => loadIssues(true)}
+           disabled={refreshing}
+           className="mt-4 flex items-center gap-2 mx-auto px-5 py-2 bg-blue-50 rounded-full text-[10px] font-black text-blue-600 uppercase tracking-widest hover:bg-blue-100 transition-all"
+         >
+           <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
+           {refreshing ? 'Refreshing...' : 'Refresh Feed'}
+         </button>
       </header>
 
       <div className="flex gap-3 overflow-x-auto pb-6 -mx-4 px-4 no-scrollbar">

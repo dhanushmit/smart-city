@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, AlertCircle, Trash2, Radio, User, LogOut, X, Shield } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, Trash2, Radio, User, LogOut, X, Shield, Briefcase } from 'lucide-react';
 import { useCitizen } from '@/lib/CitizenContext';
 
 const citizenItems = [
@@ -13,7 +13,8 @@ const citizenItems = [
 ];
 
 const workerItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Task Console' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
+  { to: '/tasks', icon: Briefcase, label: 'Task Console' },
   { to: '/feed', icon: Radio, label: 'Public Feed' },
   { to: '/profile', icon: User, label: 'Account' },
 ];

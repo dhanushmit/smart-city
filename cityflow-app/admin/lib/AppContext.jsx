@@ -34,7 +34,17 @@ export function AppProvider({ children }) {
     restore();
   }, []);
 
-  async function loadData() {
+  useEffect(() => {
+    let interval;
+    if (user && user.role === 'admin') {
+      interval = setInterval(() => {
+        loadData(true);
+      }, 15000); // 15 seconds auto-refresh Live
+    }
+    return () => clearInterval(interval);
+  }, [user]);
+
+  async function loadData(silent = false) {
     try {
       const [issuesData, workersData, binsData] = await Promise.all([
         apiGetAllIssues(),

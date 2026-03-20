@@ -15,7 +15,7 @@ const STATUS_CONFIG = {
 };
 
 async function apiUpdateStatus(id, status, token) {
-  const res = await fetch(`${API_BASE}/api/issues/${id}/status/`, {
+  const res = await fetch(`${API_BASE}/api/issues/${id}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ status, note: `Status updated to ${status} by field worker.` }),
@@ -49,7 +49,7 @@ export default function TaskConsolePage() {
 
   useEffect(() => {
     loadTasks();
-    const interval = setInterval(() => loadTasks(true), 30000);
+    const interval = setInterval(() => loadTasks(true), 15000);
     return () => clearInterval(interval);
   }, [user]);
 

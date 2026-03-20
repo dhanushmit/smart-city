@@ -108,7 +108,7 @@ const FeedCard = ({ issue, onUpdate }) => {
 
                    <div>
                       <h3 className="text-2xl font-black text-gray-900 tracking-tight leading-tight mb-4">{issue.title}</h3>
-                      {issue.image_url && <img src={`http://localhost:5000${issue.image_url}`} alt="" className="w-full h-64 object-cover rounded-[36px] shadow-xl border-4 border-white mb-4" />}
+                      {issue.image_url && <img src={`${API_BASE}${issue.image_url}`} alt="" className="w-full h-64 object-cover rounded-[36px] shadow-xl border-4 border-white mb-4" />}
                       <p className="text-sm text-gray-500 font-medium leading-relaxed italic">"{issue.description || 'No description provided.'}"</p>
                    </div>
 
@@ -169,8 +169,8 @@ export default function FeedPage() {
 
   useEffect(() => {
     loadIssues();
-    // Auto-refresh every 30 seconds for live updates
-    const interval = setInterval(() => loadIssues(true), 30000);
+    // Auto-refresh every 15 seconds for live updates
+    const interval = setInterval(() => loadIssues(true), 15000);
     return () => clearInterval(interval);
   }, []);
 

@@ -12,10 +12,10 @@ router.get('/dashboard-stats', authMiddleware, async (req, res) => {
   const workers = await db.get("SELECT COUNT(*) as count FROM users WHERE role = 'worker'");
   
   return res.json({
-    total_issues: total.count || 0,
-    high_priority: high.count || 0,
-    overflow_bins: bins.count || 0,
-    active_workers: workers.count || 0,
+    total_issues: Number(total?.count || 0),
+    high_priority: Number(high?.count || 0),
+    overflow_bins: Number(bins?.count || 0),
+    active_workers: Number(workers?.count || 0),
     avg_resolution_hours: 42,
   });
 });
@@ -26,7 +26,7 @@ router.get('/wards', authMiddleware, async (req, res) => {
   const result = await Promise.all(wards.map(async (w) => {
     const resolved = await db.get("SELECT COUNT(*) as count FROM issues WHERE ward = ? AND status = 'Resolved'", [w]);
     const pending = await db.get("SELECT COUNT(*) as count FROM issues WHERE ward = ? AND status != 'Resolved'", [w]);
-    return { id: w, name: w, resolved: resolved.count || 0, pending: pending.count || 0 };
+    return { id: w, name: w, resolved: Number(resolved?.count || 0), pending: Number(pending?.count || 0) };
   }));
   return res.json(result);
 });

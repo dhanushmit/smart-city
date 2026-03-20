@@ -146,4 +146,21 @@ router.post('/:id/comment', authMiddleware, async (req, res) => {
   return res.json(comment);
 });
 
+router.delete('/:id', authMiddleware, async (req, res) => {
+  const db = getDb();
+  const issue = await db.get('SELECT reported_by FROM issues WHERE id = ?', [req.params.id]);
+  if (!issue) return res.status(404).json({ detail: 'Not found' });
+  
+  if (req.userRole !== 'admin' && issue.reported_by !== req.userId) {
+    return res.status(403).json({ detail: 'Forbidden' });
+  }
+
+  await db.run('DELETE FROM issues WHERE id = ?', [req.params.id]);
+  await db.run('DELETE FROM comments WHERE issue_id = ?', [req.params.id]);
+  await db.run('DELETE FROM timelines WHERE issue_id = ?', [req.params.id]);
+  await db.run('DELETE FROM upvotes WHERE issue_id = ?', [req.params.id]);
+
+  return res.json({ status: 'success' });
+});
+
 module.exports = router;

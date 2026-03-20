@@ -1,8 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { apiGetMyIssues } from '@/lib/api';
+import { apiGetMyIssues, apiDeleteIssue } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, CheckCircle2, AlertCircle, MapPin, Search, ChevronRight, X, MessageCircle, Send } from 'lucide-react';
+import { Clock, CheckCircle2, AlertCircle, MapPin, Search, ChevronRight, X, MessageCircle, Send, Trash2 } from 'lucide-react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function MyIssuesPage() {
   const [issues, setIssues] = useState([]);
@@ -10,9 +12,32 @@ export default function MyIssuesPage() {
   const [filter, setFilter] = useState('All');
   const [selected, setSelected] = useState(null);
 
+  const loadData = async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const d = await apiGetMyIssues();
+      setIssues(Array.isArray(d) ? d : []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    apiGetMyIssues().then(d => { setIssues(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => setLoading(false));
+    loadData();
+    const interval = setInterval(() => loadData(true), 15000);
+    return () => clearInterval(interval);
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this report?')) return;
+    try {
+      await apiDeleteIssue(id);
+      setIssues(prev => prev.filter(i => i.id !== id));
+      setSelected(null);
+    } catch (e) { alert(e.message); }
+  };
 
   const filtered = issues.filter(i => filter === 'All' || i.status === filter);
 
@@ -47,7 +72,7 @@ export default function MyIssuesPage() {
              <div className="flex items-center gap-5">
                 <div className="w-16 h-16 rounded-[20px] bg-slate-50 flex-shrink-0 border border-slate-100 overflow-hidden flex items-center justify-center">
                    {issue.image_url ? (
-                     <img src={`http://localhost:5000${issue.image_url}`} alt="" className="w-full h-full object-cover" />
+                     <img src={`${API_BASE}${issue.image_url}`} alt="" className="w-full h-full object-cover" />
                    ) : (
                      <AlertCircle size={24} className="text-slate-300" />
                    )}
@@ -121,7 +146,7 @@ export default function MyIssuesPage() {
                    <div className="space-y-4">
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Evidence & Location</p>
                       <div className="w-full h-56 rounded-[32px] overflow-hidden shadow-xl border-4 border-white">
-                         <img src={`http://localhost:5000${selected.image_url}`} alt="" className="w-full h-full object-cover" />
+                         <img src={`${API_BASE}${selected.image_url}`} alt="" className="w-full h-full object-cover" />
                       </div>
                       <div className="flex items-center gap-2 p-4 bg-slate-50 rounded-2xl text-xs font-bold text-gray-600">
                          <MapPin size={16} className="text-blue-600" /> {selected.location_text || selected.ward}
@@ -153,9 +178,17 @@ export default function MyIssuesPage() {
                    </div>
                 </div>
 
-                <div className="absolute bottom-0 left-0 w-full p-6 bg-white/95 backdrop-blur-md border-t border-slate-50">
-                    <button className="w-full btn-primary !rounded-2xl flex items-center justify-center gap-2" onClick={() => setSelected(null)}>Got it</button>
-                </div>
+                <div className="absolute bottom-0 left-0 w-full p-6 bg-white/95 backdrop-blur-md border-t border-slate-50 flex gap-3">
+                    <button className="flex-1 btn-primary !rounded-2xl flex items-center justify-center gap-2" onClick={() => setSelected(null)}>Got it</button>
+                    {selected.status === 'Submitted' && (
+                       <button
+                         className="px-6 py-4 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-all border border-red-100 flex items-center justify-center"
+                         onClick={() => handleDelete(selected.id)}
+                       >
+                         <Trash2 size={20} />
+                       </button>
+                    )}
+                 </div>
              </motion.div>
           </motion.div>
         )}

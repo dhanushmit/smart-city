@@ -95,8 +95,8 @@ router.get('/workers', authMiddleware, async (req, res) => {
     `, [w.id]);
     return {
       ...userResponse(w),
-      open_tasks: stats.open_tasks || 0,
-      completed_tasks: stats.completed_tasks || 0,
+      open_tasks: Number(stats.open_tasks || 0),
+      completed_tasks: Number(stats.completed_tasks || 0),
       status: 'Active',
     };
   }));
@@ -116,7 +116,7 @@ router.get('/workers/:id', authMiddleware, async (req, res) => {
       COUNT(CASE WHEN status IN ('Resolved','Closed') THEN 1 END) as completed_tasks
     FROM issues WHERE assigned_to = ?
   `, [w.id]);
-  return res.json({ ...userResponse(w), ...stats, status: 'Active' });
+  return res.json({ ...userResponse(w), open_tasks: Number(stats.open_tasks || 0), completed_tasks: Number(stats.completed_tasks || 0), status: 'Active' });
 });
 
 // POST /api/auth/change-password/

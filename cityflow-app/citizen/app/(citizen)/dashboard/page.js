@@ -32,24 +32,28 @@ export default function CitizenDashboard() {
   const [workerTasks, setWorkerTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchData = async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const [pub, my] = await Promise.all([apiGetPublicIssues(), apiGetMyIssues()]);
+      setPublicIssues(Array.isArray(pub) ? pub : []);
+      setMyIssues(Array.isArray(my) ? my : []);
+      
+      if (user?.role === 'worker') {
+        const tasks = await apiGetWorkerTasks(user.id);
+        setWorkerTasks(Array.isArray(tasks) ? tasks : []);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-       try {
-          const [pub, my] = await Promise.all([apiGetPublicIssues(), apiGetMyIssues()]);
-          setPublicIssues(Array.isArray(pub) ? pub : []);
-          setMyIssues(Array.isArray(my) ? my : []);
-          
-          if (user?.role === 'worker') {
-             const tasks = await apiGetWorkerTasks(user.id);
-             setWorkerTasks(Array.isArray(tasks) ? tasks : []);
-          }
-       } catch (e) {
-          console.error(e);
-       } finally {
-          setLoading(false);
-       }
-    };
     fetchData();
+    const interval = setInterval(() => fetchData(true), 15000); // Poll every 15s
+    return () => clearInterval(interval);
   }, [user]);
 
   const isWorker = user?.role === 'worker';
@@ -127,7 +131,7 @@ export default function CitizenDashboard() {
                     <div className="flex items-start gap-6">
                        <div className="w-24 h-24 rounded-[24px] bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200 shadow-inner group">
                           {issue.image_url ? (
-                            <img src={`http://localhost:5000${issue.image_url}`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                            <img src={`${API_BASE}${issue.image_url}`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-300">
                                <AlertCircle size={32} />

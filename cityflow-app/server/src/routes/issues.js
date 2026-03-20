@@ -27,7 +27,7 @@ function calculatePriority(cat, hoursSince) {
 }
 
 async function getIssueAnalytics(db, issueId) {
-  const comments = await db.all('SELECT c.*, u.first_name || " " || u.last_name as user_name FROM comments c JOIN users u ON c.user_id = u.id WHERE c.issue_id = ? ORDER BY c.created_at DESC', [issueId]);
+  const comments = await db.all("SELECT c.*, u.first_name || ' ' || u.last_name as user_name FROM comments c JOIN users u ON c.user_id = u.id WHERE c.issue_id = ? ORDER BY c.created_at DESC", [issueId]);
   const timeline = await db.all('SELECT * FROM timelines WHERE issue_id = ? ORDER BY changed_at DESC', [issueId]);
   return { comments, timeline };
 }
@@ -36,7 +36,7 @@ async function getIssueAnalytics(db, issueId) {
 router.get('/', authMiddleware, async (req, res) => {
   const { status, priority, ward, category, search, assigned_to } = req.query;
   const db = getDb();
-  let query = 'SELECT i.*, u.first_name || " " || u.last_name as reported_by_name FROM issues i JOIN users u ON i.reported_by = u.id WHERE 1=1';
+  let query = "SELECT i.*, u.first_name || ' ' || u.last_name as reported_by_name FROM issues i JOIN users u ON i.reported_by = u.id WHERE 1=1";
   const params = [];
 
   if (status) { query += ' AND i.status = ?'; params.push(status); }
